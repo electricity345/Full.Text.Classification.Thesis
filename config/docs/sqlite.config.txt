@@ -1,0 +1,10 @@
+** Creating sqlite files **
+
+1) Insert SQL file into SQLite File
+  (Template) sqlite3 SQLiteFILE SQLFILE
+  sqlite3 sports.sdb < sports.sql
+
+2) Escaping single quotes in SQLite
+  Must escape it with another single quote.
+  (Ex) INSERT INTO sports (name, sport, location_name, latitude, longitude) VALUES 
+('Colorado Rapids', 'MLS', 'Dick''s Sporting Goods Park', '39.805556', '-104.891944'); 

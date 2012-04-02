@@ -1,0 +1,111 @@
+** How to upload a new category for searching **
+1) User sends a .sdb file containing 3 sqlite tables
+
+2) Data Table => (data)
+  Used to insert category keywords and any other information that are associated with each particular entry
+
+  1) ** Essential Columns **
+    1) id INTEGER PRIMARY KEY            # Used for auto-increment
+       - This is used to ensure that each data entry is unique
+
+    2) A user defined column
+       (Ex) name varchar(200) NOT NULL
+      
+  2) Users can define any number of columns that they want with their data.
+
+  3) No need to input the "id" field when you input data since it automatically auto-increments for you.
+
+3) Column Description Table => (column_description)
+  Used to describe the columns defined in the Data Table
+
+  1) Number of rows in table must be one less than the number of columns defined in the Data Table. (Don't include the id column for the Data Table) 
+    (Ex) If there are 5 columns in the Data Table, there must be 4 rows in the Column Description Table. We skip the id column since the table
+         automatically auto-increments for you. 
+
+  2) ** Essential Columns **
+    1) id INTEGER PRIMARY KEY
+       - Maps to the column id for the Data Table
+       - id = 1 refers to first column in Data Table
+
+    2) col_name varchar(200) NOT NULL
+       - The user's name of the column 
+
+    3) col_type varchar(50) NOT NULL
+       - Designates what the column type is for a column in the Data Table
+       - Types Supported:
+        (ONLY USED ONCE)
+        1) "id" => Special field used to highlight the primary key of the table. No matching is done on this field.
+        2) "geography" => Breaks down the field based off of a geographic specification. Will be encorporated to the map.
+                          Format: (city, state, country) OR (city, country)
+        3) "location" => Designates the name of the location will be entered to geo database so that it can be mapped.
+                         If entry is not found, then it will be left blank. If a location, or latitude and longitude are also given,
+                         it will then map that location with a pin and whatever value in the field will be placed as the name
+        4) "latitude" => Stores latitude information - No matching is done for field
+        5) "longitude" => Stores longitude information - No matching is done for field
+        
+        (Used Multiple Times) - Choices for better matching
+        1) "data" => Straight up matching of the field values. No special tagging done. 
+        2) "sports" => Breaks down the team name and geographical location. (New alias)
+        3) "people" => Breaks down the last name and first name of the person
+                       Format: (Last [Suffix], First [Middle]) OR (First [Middle] Last [Suffix])         
+
+    5) match_level INTEGER NOT NULL
+       - Designates the matching level of the categorization search.
+       - Types Supported:
+         1) "0" => Indicates field is not used for matching.
+         2) "1" => Indicates primary field. The results that the user desires. See the term, guarantee to find it.
+         3) "2" => Indicates secondary field. These fields are used to help ascertain matches for the primary field.
+                   Involves guessing. Sees the term, but not guarantee that match is correct.
+
+4) Alias Table
+  Used to insert alternate names for entries in the Data Table
+
+  1) ** Essential **
+    1) id INTEGER PRIMARY KEY            # Used for auto-increment
+       - This is used to ensure that each data entry is unique
+
+    2) data_id INTEGER NOT NULL
+       - Correlates to the id in the Data Table
+
+    3) alias_name varchar(200) NOT NULL
+       - Alias name for the entry in the Data Table
+
+5) Description (OPTIONAL)
+  1) ** Essential **
+    1) name varchar(200) NOT NULL,
+       - name = name of category on page
+
+    2) description varchar(200) NOT NULL
+       - description = describes the category (explains what the data encompasses) 
+
+
+** Default Template **
+CREATE TABLE IF NOT EXISTS data (
+  id INTEGER PRIMARY KEY,
+  col1 varchar(200) NOT NULL,
+  col2 double NOT NULL,
+  col3 varchar(200) NOT NULL
+  .
+  .
+  .
+);
+
+CREATE TABLE IF NOT EXISTS column_description (
+  id INTEGER PRIMARY KEY,
+  col_name varchar(200) NOT NULL,
+  col_type varchar(50) NOT NULL, 
+  match_level INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS alias (
+  id INTEGER PRIMARY KEY,
+  data_id INTEGER NOT NULL,
+  alias_name varchar(200) NOT NULL,
+  FOREIGN KEY (data_id) REFERENCES data(id)
+);
+
+CREATE TABLE IF NOT EXISTS description (
+  name varchar(200) NOT NULL,
+  description varchar(200) NOT NULL
+);
+
